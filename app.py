@@ -23,3 +23,33 @@ def get_pdf_text(pdf_docs):
         for page in pdf_reader.pages:
             text+=page.extract_text()
     return text
+
+#divide the text into chunk
+def get_text_chunks(text):
+    text_splitter=RecursiveCharacterTextSplitter(
+        chunk_size=10000,
+        chunk_overlap=1000
+    )
+    chunks=text_splitter.split_text(text)
+    return chunks
+
+def get_vectore_store(text_chunks):
+    embeddings=GoogleGenerativeAIEmbeddings(model="models/embedding-001")
+    vectore_store=FAISS.from_texts(text_chunks,embedding=embeddings)
+    vectore_store.save_local("faiss_index")
+
+def get_convercational_chain():
+    prommpt_template=  """
+    Answer the question as detailed as possible from the provided context, make sure to provide all the details, if the answer is not in
+    provided context just say, "answer is not available in the context", don't provide the wrong answer\n\n
+    Context:\n {context}?\n
+    Question: \n{question}\n
+
+    Answer:
+    """
+    model=ChatGoogleGenerativeAI(model="gemini-pro",temperature=0.3)
+
+    prompt=PromptTemplate(template=prommpt_template, input_variables=["contex","question"])
+    chain=load_qa_chain(model, chain_type="studff",prompt=prompt)
+    return chain
+
