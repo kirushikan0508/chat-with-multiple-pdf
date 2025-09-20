@@ -1,0 +1,7 @@
+streamlit
+google-generativeai   # for gemini pro
+python-dotenv         # for environment variables
+langchain             # fix spelling (was lagchain)
+PyPDF2                # read pdf 
+faiss-cpu             # store the embedding 
+langchain-google-genai
