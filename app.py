@@ -71,7 +71,7 @@ def user_input(user_question):
 # Streamlit UI
 def main():
     st.set_page_config(page_title="Chat with PDF")
-    st.header("Chat with PDF using Gemini 🚀")
+    st.header("Chat with PDF using Gemini")
 
     user_question = st.text_input("Ask a Question from the PDF Files")
 
@@ -90,7 +90,7 @@ def main():
                 raw_text = get_pdf_text(pdf_docs)
                 text_chunks = get_text_chunks(raw_text)
                 get_vector_store(text_chunks)
-                st.success("Done ✅")
+                st.success("Done")
 
 if __name__ == "__main__":
     main()
