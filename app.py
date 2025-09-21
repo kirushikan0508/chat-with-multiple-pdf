@@ -28,8 +28,8 @@ def get_pdf_text(pdf_docs):
 # Split text into chunks
 def get_text_chunks(text):
     text_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1000,
-        chunk_overlap=200
+        chunk_size=10000,
+        chunk_overlap=1000
     )
     return text_splitter.split_text(text)
 
@@ -51,22 +51,25 @@ def get_conversational_chain():
 
     Answer:
     """
-    model = ChatGoogleGenerativeAI(model="gemini-pro", temperature=0.3)
+    # ✅ Use the latest Gemini model
+    model = ChatGoogleGenerativeAI(model="gemini-1.5-flash", temperature=0.3)
 
     prompt = PromptTemplate(template=prompt_template, input_variables=["context", "question"])
     chain = load_qa_chain(model, chain_type="stuff", prompt=prompt)
     return chain
 
+
 # Handle user input
 def user_input(user_question):
-    embeddings = GoogleGenerativeAIEmbeddings(model="models/embedding-001")
-    new_db = FAISS.load_local("faiss_index", embeddings)
+    embeddings = HuggingFaceEmbeddings(model_name="all-MiniLM-L6-v2")  # ✅ same as when saving
+    new_db = FAISS.load_local("faiss_index", embeddings, allow_dangerous_deserialization=True)
     docs = new_db.similarity_search(user_question)
 
     chain = get_conversational_chain()
     response = chain({"input_documents": docs, "question": user_question}, return_only_outputs=True)
 
     st.write("Reply:", response["output_text"])
+
 
 # Streamlit UI
 def main():
